@@ -7,8 +7,6 @@ const Modes_1 = require("../Modes");
 const CommandParser_1 = require("../parsers/CommandParser");
 const BeatmapRepository_1 = require("../webapi/BeatmapRepository");
 const TypedConfig_1 = require("../TypedConfig");
-const rosu_pp_1 = require("rosu-pp");
-const OsuFileReader_1 = require("../libs/OsuFileReader");
 class MapChecker extends LobbyPlugin_1.LobbyPlugin {
     constructor(lobby, option = {}) {
         super(lobby, 'MapChecker', 'mapChecker');
@@ -227,28 +225,10 @@ class MapChecker extends LobbyPlugin_1.LobbyPlugin {
         if (map.beatmapset) {
             const desc = this.getMapDescription(map, map.beatmapset);
             this.lobby.SendMessage(`!mp map ${this.lobby.mapId} ${this.option.gamemode.value} | ${desc}`);
-            //TODO: Move this into it's own lobby plugin.
-            if (this.option.send_pp_data == true) {
-                const pp_string = this.getPPString(map);
-                this.lobby.SendMessage(pp_string);
-            }
         }
         else {
             this.lobby.SendMessage(`!mp map ${this.lobby.mapId} ${this.option.gamemode.value}`);
         }
-    }
-    getPPString(map) {
-        let pp_string = `PP calculation for this beatmap is not available.`;
-        //TODO: Make the accuracies configurable via the config file.
-        const accuracies = [100, 99, 98, 95];
-        const pp_data = getPPValues(map, accuracies);
-        if (pp_data.length > 0) {
-            pp_string = `PP for this beatmap:`;
-            for (let i = 0; i < pp_data.length; i++) {
-                pp_string += ` | (${accuracies[i]}%): ${pp_data[i]}pp `;
-            }
-        }
-        return pp_string;
     }
     getMapDescription(map, set) {
         let desc = this.option.map_description;
@@ -538,26 +518,5 @@ function unifyParamName(name) {
         return 'disallow_convert';
     }
     return name;
-}
-function getPPValues(map, accuracy) {
-    let reader = new OsuFileReader_1.OsuFileReader();
-    const file = reader.getOsuFilePathFromId(map.id);
-    if (file == '') {
-        return [];
-    }
-    let acc_param = [];
-    for (const acc of accuracy) {
-        acc_param.push({ acc: acc });
-    }
-    const arg = {
-        path: file,
-        params: acc_param
-    };
-    const pp_data = (0, rosu_pp_1.calculate)(arg);
-    let pp_values = [];
-    for (const data of pp_data) {
-        pp_values.push(Math.round(data.pp));
-    }
-    return pp_values;
 }
 //# sourceMappingURL=MapChecker.js.map
