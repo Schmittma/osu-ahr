@@ -18,6 +18,7 @@ import { AfkKicker } from '../plugins/AfkKicker';
 import { MiscLoader } from '../plugins/MiscLoader';
 import { parser } from '../parsers/CommandParser';
 import { CacheCleaner } from '../plugins/CacheCleaner';
+import { PPCalculator } from '../plugins/PPCalculator';
 
 const logger = getLogger('ahr');
 
@@ -46,6 +47,7 @@ export class OahrBase {
   afkkicker: AfkKicker;
   miscLoader: MiscLoader;
   cleaner: CacheCleaner;
+  ppCalculator: PPCalculator;
   option: OahrCliOption = OahrCliDefaultOption;
 
   constructor(client: IIrcClient) {
@@ -66,6 +68,7 @@ export class OahrBase {
     this.keeper = new LobbyKeeper(this.lobby);
     this.afkkicker = new AfkKicker(this.lobby);
     this.cleaner = new CacheCleaner(this.lobby);
+    this.ppCalculator = new PPCalculator(this.lobby);
     this.lobby.RaisePluginsLoaded();
   }
 

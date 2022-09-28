@@ -72,6 +72,10 @@
     "map_description": "[https://osu.ppy.sh/b/${map_id} ${title}] | Star Rating: ${star} | Duration: ${length} | Alternative:  [https://beatconnect.io/b/${beatmapset_id} (BeatConnect.io)] | [https://kitsu.moe/d/${beatmapset_id} (Kitsu.moe)]",
     "send_pp_data": true
   },
+  "PPCalculator": {
+    "enabled": false,
+    "accuracies": [100, 99, 98, 95]
+  },
   "MiscLoader": {},
   "MapRecaster": {},
   "MatchStarter": {
