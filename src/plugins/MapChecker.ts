@@ -8,6 +8,8 @@ import { BeatmapRepository, FetchBeatmapError, FetchBeatmapErrorReason, BeatmapC
 import { Beatmap, Beatmapset } from '../webapi/Beatmapsets';
 import { getConfig } from '../TypedConfig';
 import { Logger } from '../Loggers';
+import { calculate } from "rosu-pp"
+import { OsuFileReader } from '../libs/OsuFileReader';
 
 export type MapCheckerOption = {
   enabled: boolean;
@@ -19,6 +21,7 @@ export type MapCheckerOption = {
   gamemode: PlayMode;
   allow_convert: boolean;
   map_description: string;
+  send_pp_data: boolean;
 };
 
 export type MapCheckerUncheckedOption =
@@ -258,9 +261,32 @@ export class MapChecker extends LobbyPlugin {
     if (map.beatmapset) {
       const desc = this.getMapDescription(map, map.beatmapset);
       this.lobby.SendMessage(`!mp map ${this.lobby.mapId} ${this.option.gamemode.value} | ${desc}`);
+      
+      //TODO: Move this into it's own lobby plugin.
+      if(this.option.send_pp_data == true)
+      {
+        const pp_string = this.getPPString(map);
+        this.lobby.SendMessage(pp_string);
+      }
     } else {
       this.lobby.SendMessage(`!mp map ${this.lobby.mapId} ${this.option.gamemode.value}`);
     }
+  }
+
+  private getPPString(map: BeatmapCache): string {
+    let pp_string = `PP calculation for this beatmap is not available.`;
+    //TODO: Make the accuracies configurable via the config file.
+    const accuracies = [100, 99, 98, 95];
+    const pp_data = getPPValues(map, accuracies);
+
+    if(pp_data.length > 0) {
+      pp_string = `PP for this beatmap:`;
+      for(let i = 0; i < pp_data.length; i++) {
+        pp_string += ` | ${accuracies[i]}%: ${pp_data[i]}pp `;
+      }
+    }
+
+    return pp_string
   }
 
   private getMapDescription(map: BeatmapCache, set: Beatmapset) {
@@ -561,4 +587,33 @@ function unifyParamName(name: string): string {
     return 'disallow_convert';
   }
   return name;
+}
+
+function getPPValues(map: BeatmapCache, accuracy: number[]): number[]{
+  
+  let reader = new OsuFileReader();
+  const file = reader.getOsuFilePathFromId(map.id);
+  
+  if(file == ''){
+    return [];
+  }
+
+  let acc_param = [];
+  for (const acc of accuracy) {
+    acc_param.push({acc: acc});
+  }
+
+  const arg = {
+    path: file,
+    params: acc_param
+  }
+
+  const pp_data = calculate(arg);
+
+  let pp_values = [];
+  for (const data of pp_data) {
+    pp_values.push(Math.round(data.pp));
+  }
+
+  return pp_values;
 }
