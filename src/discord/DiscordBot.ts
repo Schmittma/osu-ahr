@@ -164,7 +164,7 @@ export class DiscordBot {
       const lobbyNumber = ahr.lobby.lobbyId ?? 'new_lobby';
       this.registeAhr(ahr, interaction);
       await this.updateMatchSummary(ahr);
-      await interaction.editReply(`😀 Successfully made a lobby.\n[Lobby History](https://osu.ppy.sh/mp/${lobbyNumber})`);
+      await interaction.editReply(`😀 Successfully made a lobby.\nLobby ID: ${lobbyNumber}.\n[Lobby History](https://osu.ppy.sh/mp/${lobbyNumber})`);
     } catch (e: any) {
       logger.error(`@DiscordBot#make\n${e.message}\n${e.stack}`);
       await interaction.editReply(`There was an error while making a discord channel. ${e.message}`);
