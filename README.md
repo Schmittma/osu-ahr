@@ -326,6 +326,29 @@ Configs related to host-skip vote and automatic AFK host skip.
 + `vote_msg_defer_ms` : `number` Cooldown time for vote progress message.
 + `start_when_all_player_ready` : `boolean` Starts the match when everyone is ready.
 
+## PPCalculation Section
+
+Configuration regarding the output of Tillerino style PP values to the lobby chat.
+
+Enabling this feature will require the installation of [Rust](https://www.rust-lang.org/tools/install).
+Additionally, all .osu files will be stored in a local folder. 
+
++ `enabled` : `boolean` Enable PP Calculation
++ `accuracies` : `number[]` One or more accuracies which will be displayed
+
+Example output:
+`PP for this beatmap: 100%: 531pp | 99%: 471pp | 98%: 434pp | 95%: 375pp`
+
+```json
+{
+ ...
+  "PPCalculator": {
+    "enabled": false,
+    "accuracies": [100, 99, 98, 95]
+  }
+  ...
+}
+```
 ## MatchAborter Section
 
 !abort vote and auto abort configs
