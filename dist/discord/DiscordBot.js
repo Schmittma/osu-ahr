@@ -101,6 +101,9 @@ class DiscordBot {
             case 'enter':
                 await this.enter(interaction);
                 break;
+            case 'regulation':
+                await this.regulation(interaction);
+                break;
             case 'info':
                 await this.info(interaction);
                 break;
@@ -108,6 +111,9 @@ class DiscordBot {
                 await this.say(interaction);
                 break;
             case 'config':
+                break;
+            case 'help':
+                await this.help(interaction);
                 break;
             case 'close':
                 await this.close(interaction);
@@ -190,6 +196,40 @@ class DiscordBot {
             logger.error(`@DiscordBot#enter\n${e.message}\n${e.stack}`);
             await interaction.editReply(`😫 There was an error while making a discord channel. ${e}`);
         }
+    }
+    async regulation(interaction) {
+        await interaction.deferReply();
+        const lobbyId = this.resolveLobbyId(interaction);
+        if (!lobbyId) {
+            await interaction.editReply('Please specify a lobby ID.');
+            return;
+        }
+        const ahr = this.ahrs[lobbyId];
+        if (!ahr) {
+            await interaction.editReply('Invalid lobby specified.');
+            return;
+        }
+        const msg = this.createRegulationChangeMessage(interaction);
+        if (!msg) {
+            await interaction.editReply('Please provide at least one regulation to be changed');
+            return;
+        }
+        ahr.lobby.RaiseReceivedChatCommand(ahr.lobby.GetOrMakePlayer(ahr.client.nick), msg);
+        await interaction.editReply(`Executed: ${msg}`);
+    }
+    async help(interaction) {
+        await interaction.deferReply();
+        await interaction.editReply('This bot creates and manages auto host rotate lobbies in osu.\n' +
+            'Usage:\n' +
+            '\`\`\`' +
+            '/make <lobby name> - To create the actual managed multiplayer lobby\n' +
+            '/say <lobby id> <message> - Write a message in a lobby.\nConfigurations of the lobby can be changed with this command.\nRefer to the full documentation for usage of administrator commands\n' +
+            '/regulation <lobby id> [parameters] - Easier way to change specific regulations\n' +
+            '/close <lobby id> - Close a lobby manually\n' +
+            '/close <lobby id> - Stop managing the lobby put do not close it' +
+            '\`\`\`\n' +
+            'Lobbies will automatically close after a certain amount of time when nobody is inside the lobby.\n\n' +
+            'View the full documentation on https://github.com/Schmittma/osu-ahr#administrator-commands');
     }
     async info(interaction) {
         await interaction.deferReply();
@@ -435,6 +475,29 @@ class DiscordBot {
             }
         }
         return undefined;
+    }
+    createRegulationChangeMessage(interaction) {
+        const min_star = interaction.options.getNumber("min_star", false);
+        const max_star = interaction.options.getNumber("max_star", false);
+        const min_length = interaction.options.getInteger("min_length", false);
+        const max_length = interaction.options.getInteger("max_length", false);
+        let msg = "*regulation";
+        if (!min_star && !max_star && !min_length && !max_length) {
+            return null;
+        }
+        if (min_star) {
+            msg += " min_star=" + min_star;
+        }
+        if (max_star) {
+            msg += " max_star=" + max_star;
+        }
+        if (min_length) {
+            msg += " min_length=" + min_length;
+        }
+        if (max_length) {
+            msg += " max_length=" + max_length;
+        }
+        return msg;
     }
     generateInviteLink() {
         return this.discordClient.generateInvite({

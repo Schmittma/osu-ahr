@@ -29,6 +29,49 @@ export const BotCommands: ApplicationCommandData[] = [
     ]
   },
   {
+    name: 'help',
+    description: 'Print a help message',
+    defaultPermission: false,
+    options: []
+  },
+  {
+    name: 'regulation',
+    description: 'Change regulations of a lobby',
+    defaultPermission: false,
+    options: [
+      {
+        type: 4,
+        name: 'lobby_id',
+        description: 'The tournament lobby ID of the lobby to enter.',
+        required: false
+      },
+      {
+        type: 10,
+        name: 'min_star',
+        description: 'The minimum star rating the bot will enforce',
+        required: false
+      },
+      {
+        type: 10,
+        name: 'max_star',
+        description: 'The maximum star rating the bot will enforce',
+        required: false
+      },
+      {
+        type: 4,
+        name: 'min_length',
+        description: 'The minimum beatmap length in seconds',
+        required: false
+      },
+      {
+        type: 4,
+        name: 'max_length',
+        description: 'The maximum beatmap length in seconds',
+        required: false
+      }
+    ]
+  },
+  {
     name: 'info',
     description: 'Show the status of a lobby.',
     defaultPermission: false,
