@@ -17,6 +17,7 @@ The host rotation is managed with a queue. Players are added to the queue when j
 |`!update`| Updates current selected map to the latest version. Use when a host picks an outdated map.|
 |`!regulations`| Shows any current regulations.|
 |`!rank`| Show player rank.|
+|`!pp [mods]`| Show PP for this map with any mod combinations (HD, HDDT, EZFLNFHT) |
 
 ## Host Commands
 
