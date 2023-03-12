@@ -1,7 +1,7 @@
 import { Lobby } from "../Lobby";
 import { getConfig } from "../TypedConfig";
 import { LobbyPlugin } from "./LobbyPlugin";
-import { calculate } from "rosu-pp"
+import { Beatmap, Calculator } from "rosu-pp"
 import { OsuFileReader } from '../libs/OsuFileReader';
 import { BanchoResponseType } from "../parsers/CommandParser";
 
@@ -45,7 +45,7 @@ export class PPCalculator extends LobbyPlugin {
   }
 
   private onValidatedMap() {
-    if(this.option.enabled == true){
+    if(this.option.enabled === true){
       this.getPPString().then(pp_string => { this.lobby.SendMessage(pp_string) });
     }
   }
@@ -64,33 +64,30 @@ export class PPCalculator extends LobbyPlugin {
       }
     }
 
-    return pp_string
+    return pp_string;
   }
 }
 
 async function getPPValues(mapId: number, accuracy: number[]): Promise<number[]>{
-  
-  let reader = new OsuFileReader();
+
+  const reader = new OsuFileReader();
   const file = await reader.getOsuFilePathFromId(mapId);
-  
-  if(file == ''){
+
+  if(file === ''){
     return [];
   }
 
-  let acc_param = [];
+  const map = new Beatmap({path: file});
+
+  const calc_args = {
+    mode: 0
+  };
+
+  const calculator = new Calculator(calc_args);
+
+  const pp_values = [];
   for (const acc of accuracy) {
-    acc_param.push({acc: acc});
-  }
-
-  const arg = {
-    path: file,
-    params: acc_param
-  }
-
-  const pp_data = calculate(arg);
-
-  let pp_values = [];
-  for (const data of pp_data) {
+    const data = calculator.acc(acc).performance(map);
     pp_values.push(Math.round(data.pp));
   }
 

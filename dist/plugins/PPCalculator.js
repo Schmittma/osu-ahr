@@ -34,7 +34,7 @@ class PPCalculator extends LobbyPlugin_1.LobbyPlugin {
         }
     }
     onValidatedMap() {
-        if (this.option.enabled == true) {
+        if (this.option.enabled === true) {
             this.getPPString().then(pp_string => { this.lobby.SendMessage(pp_string); });
         }
     }
@@ -55,22 +55,19 @@ class PPCalculator extends LobbyPlugin_1.LobbyPlugin {
 }
 exports.PPCalculator = PPCalculator;
 async function getPPValues(mapId, accuracy) {
-    let reader = new OsuFileReader_1.OsuFileReader();
+    const reader = new OsuFileReader_1.OsuFileReader();
     const file = await reader.getOsuFilePathFromId(mapId);
-    if (file == '') {
+    if (file === '') {
         return [];
     }
-    let acc_param = [];
-    for (const acc of accuracy) {
-        acc_param.push({ acc: acc });
-    }
-    const arg = {
-        path: file,
-        params: acc_param
+    const map = new rosu_pp_1.Beatmap({ path: file });
+    const calc_args = {
+        mode: 0
     };
-    const pp_data = (0, rosu_pp_1.calculate)(arg);
-    let pp_values = [];
-    for (const data of pp_data) {
+    const calculator = new rosu_pp_1.Calculator(calc_args);
+    const pp_values = [];
+    for (const acc of accuracy) {
+        const data = calculator.acc(acc).performance(map);
         pp_values.push(Math.round(data.pp));
     }
     return pp_values;
